@@ -44,7 +44,9 @@ Subscribes for 10s:
 
 ## Important
 
-This module keeps 2 socket pools with a default idle timeout of 20s.
+* The module keeps 2 socket pools with a default idle timeout of 20s.
+* You can only publish js objects or JSON strings.
+* Subscribe will always yield objects.
 
 ## TODO
 
