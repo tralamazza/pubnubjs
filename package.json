@@ -1,0 +1,15 @@
+{
+  "name": "pubnubjs",
+  "version": "0.0.1",
+  "description": "PubNub client",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Tralamazza <tralamazza@relayr.de>",
+  "license": "MIT",
+  "dependencies": {
+    "generic-pool": "^2.1.1",
+    "jsonparse": "0.0.6"
+  }
+}
