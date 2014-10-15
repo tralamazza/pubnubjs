@@ -1,6 +1,6 @@
 {
   "name": "pubnubjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "PubNub client",
   "main": "index.js",
   "scripts": {
