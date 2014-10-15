@@ -8,6 +8,7 @@ WIP - NOT production ready
 
 Publishes every 100ms:
 
+```js
 	var PubNubJS = require('pubnubjs');
 
 	var client = PubNubJS({
@@ -27,10 +28,11 @@ Publishes every 100ms:
 			console.log(res);
 		});
 	}, 100);
-
+```
 
 Subscribes for 10s:
 
+```js
 	client.subscribe('my_little_channel', {
 		// cipher_key: 'my encryption key',
 		// params: { auth: 'my auth key' }
@@ -40,7 +42,7 @@ Subscribes for 10s:
 		}, 10000);
 		stream.on('data', console.log);
 	});
-
+```
 
 ## Important
 
