@@ -47,7 +47,7 @@ client.subscribe('my_little_channel', {
 Grant read & write access to a channel:
 
 ```js
-streamer.grant({
+client.grant({
 	// ttl: 1440,
 	w: 1, r: 1,
 	channel: 'my_little_channel_with_auth',
