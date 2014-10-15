@@ -62,14 +62,14 @@ var PubNubClient = function(options) {
 				stream.pipe(JSONStream()).on('data', function(data) {
 					var callback = client._QUEUE.shift();
 					if (typeof callback === 'function') {
-						callback(data);
+						callback(null, data);
 					}
 				});
 			});
 		},
 		destroy: function(client) {
-			client._QUEUE.clear();
 			client.end();
+			delete client._QUEUE;
 		},
 		max: options.pool_max,
 		idleTimeoutMillis: options.pool_idletimeout
@@ -90,6 +90,9 @@ var PubNubClient = function(options) {
 			payload = '"' + cryptUtil.encryptSync(pub_options.cipher_key, payload) + '"';
 		}
 		poolResponse.acquire(function(err, client) {
+			if (err) {
+				return callback && callback(err);
+			}
 			var get = ['/publish',
 				options.publish_key,
 				options.subscribe_key,
@@ -114,6 +117,9 @@ var PubNubClient = function(options) {
 		}
 		var headers = ['Host: ' + options.host];
 		poolSub.acquire(function(err, client) {
+			if (err) {
+				return callback && callback(err);
+			}
 			var get = ['/stream',
 				options.subscribe_key,
 				querystring.escape(channel),
@@ -149,6 +155,9 @@ var PubNubClient = function(options) {
 			.replace(/\+/g,'-').replace(/\//g, '_');
 		var headers = ['Host: ' + options.host];
 		poolResponse.acquire(function(err, client) {
+			if (err) {
+				return callback && callback(err);
+			}
 			client.write('GET /v1/auth/grant/sub-key/' + options.subscribe_key +
 				'?signature=' + querystring.escape(signature) + '&' + sorted_params +
 				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF);

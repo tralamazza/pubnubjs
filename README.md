@@ -24,8 +24,8 @@ setInterval(function() {
 	client.publish('my_little_channel', { ts: Date.now() }, {
 		// cipher_key: 'my encryption key',
 		// params: { auth: 'my auth key' }
-	}, function(res) {
-		console.log(res);
+	}, function(err, data) {
+		console.log('publish', err, data);
 	});
 }, 100);
 ```
@@ -52,8 +52,8 @@ client.grant({
 	w: 1, r: 1,
 	channel: 'my_little_channel_with_auth',
 	auth: '12345'
-}, function(data) {
-	console.log('grant', data);
+}, function(err, data) {
+	console.log('grant', err, data);
 });
 ```
 
