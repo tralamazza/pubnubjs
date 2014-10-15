@@ -17,6 +17,7 @@ var client = PubNubJS({
 	// insecure: false,
 	// pool_max: 50,
 	// pool_idletimeout: 20000,
+	// secret_key: '', /* required for .grant() */
 	subscribe_key: 'sub-c- ...', /* required */
 	publish_key: 'pub-c- ...' /* required */
 });
