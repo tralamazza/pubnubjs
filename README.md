@@ -2,6 +2,7 @@
 
 WIP - NOT production ready
 
+	npm install pubnubjs
 
 ## Usage
 
@@ -10,12 +11,12 @@ Publishes every 100ms:
 	var PubNubJS = require('pubnubjs');
 
 	var client = PubNubJS({
+		// insecure: true,
 		subscribe_key: 'sub-c- ...',
 		publish_key: 'pub-c- ...'
 	});
 	setInterval(function() {
 		client.publish('my_little_channel', { ts: Date.now() }, {
-			// insecure: true,
 			// cipher_key: 'my encryption key',
 			// params: { auth: 'my auth key' }
 		}, function(res) {
@@ -27,7 +28,6 @@ Publishes every 100ms:
 Subscribes for 10s:
 
 	client.subscribe('my_little_channel', {
-		// insecure: true,
 		// cipher_key: 'my encryption key',
 		// params: { auth: 'my auth key' }
 	}, function(err, stream) {
