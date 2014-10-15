@@ -76,7 +76,12 @@ var PubNubClient = function(options) {
 	});
 
 	self.publish = function(channel, payload, pub_options, callback) {
-		pub_options = pub_options || {};
+		if (typeof pub_options === 'function') {
+			callback = pub_options;
+			pub_options = {};
+		} else {
+			pub_options = pub_options || {};
+		}
 		var headers = ['Host: ' + options.host];
 		if (typeof payload === 'object') {
 			payload = JSON.stringify(payload);
@@ -103,8 +108,8 @@ var PubNubClient = function(options) {
 	};
 
 	self.subscribe = function(channel, sub_options, callback) {
-		if (typeof params === 'function') {
-			callback = params;
+		if (typeof sub_options === 'function') {
+			callback = sub_options;
 			sub_options = {};
 		} else {
 			sub_options = sub_options || {};
