@@ -11,9 +11,13 @@ Publishes every 100ms:
 	var PubNubJS = require('pubnubjs');
 
 	var client = PubNubJS({
-		// insecure: true,
-		subscribe_key: 'sub-c- ...',
-		publish_key: 'pub-c- ...'
+		// port: 443,
+		// host: 'pubsub.pubnub.com',
+		// insecure: false,
+		// pool_max: 50,
+		// pool_idletimeout: 20000,
+		subscribe_key: 'sub-c- ...', /* required */
+		publish_key: 'pub-c- ...' /* required */
 	});
 	setInterval(function() {
 		client.publish('my_little_channel', { ts: Date.now() }, {
