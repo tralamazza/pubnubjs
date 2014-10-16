@@ -3,7 +3,7 @@ var dns = require('dns');
 var querystring = require('querystring');
 var net = require('net');
 var tls = require('tls');
-var GenericPool = require('generic-pool');
+var genericPool = require('generic-pool');
 var HTTPReaderStream = require('./lib/http-reader-stream');
 var consts = require('./lib/consts');
 var cryptUtil = require('./lib/crypt-util');
@@ -18,7 +18,7 @@ var PubNubClient = function(options) {
 	options.pool_max = options.pool_max || 50;
 	options.pool_idletimeout = options.pool_idletimeout || 20000;
 
-	var poolSub = GenericPool.Pool({
+	var poolSub = genericPool.Pool({
 		name: 'subscriber',
 		create: function(callback) {
 			dns.resolve(options.host, function(err, ips) {
@@ -45,7 +45,7 @@ var PubNubClient = function(options) {
 		idleTimeoutMillis: options.pool_idletimeout
 	});
 
-	var poolResponse = GenericPool.Pool({
+	var poolResponse = genericPool.Pool({
 		name: 'response',
 		create: function(callback) {
 			dns.resolve(options.host, function(err, ips) {
