@@ -18,60 +18,46 @@ var PubNubClient = function(options) {
 	options.pool_max = options.pool_max || 50;
 	options.pool_idletimeout = options.pool_idletimeout || 20000;
 
-	var poolSub = genericPool.Pool({
-		name: 'subscriber',
-		create: function(callback) {
-			dns.resolve(options.host, function(err, ips) {
-				if (err) {
-					return callback(err);
-				}
-				var client = (options.insecure ? net : tls).connect({
-					port: options.port,
-					host: ips[Math.floor(Math.random() * ips.length)],
-					servername: options.host
-				}, function() {
-					callback(null, client);
-				});
-				client.setEncoding(consts.STRING_ENCODING);
-				client.on('error', function(err) {
-					poolSub.destroy(client);
-				});
+	var createSocketConnection = function(callback) {
+		// We manually resolve DNS for each new socket connection.
+		// This avoids *getaddrinfo()* issues.
+		dns.resolve(options.host, function(err, ips) {
+			if (err) {
+				return callback(err);
+			}
+			var client = (options.insecure ? net : tls).connect({
+				port: options.port,
+				host: ips[Math.floor(Math.random() * ips.length)],
+				servername: options.host
+			}, function() {
+				callback(null, client);
 			});
-		},
-		destroy: function(client) {
-			client.destroy();
-		},
-		max: options.pool_max,
-		idleTimeoutMillis: options.pool_idletimeout
-	});
+			client.setEncoding(consts.STRING_ENCODING);
+		});
+	};
 
 	var poolResponse = genericPool.Pool({
 		name: 'response',
 		create: function(callback) {
-			dns.resolve(options.host, function(err, ips) {
+			createSocketConnection(function(err, client) {
 				if (err) {
 					return callback(err);
 				}
-				var client = (options.insecure ? net : tls).connect({
-					port: options.port,
-					host: ips[Math.floor(Math.random() * ips.length)],
-					servername: options.host
-				}, function() {
-					callback(null, client);
-				});
+				// `client._QUEUE` keeps a FIFO of user callbacks.
 				client._QUEUE = [];
-				client.setEncoding(consts.STRING_ENCODING);
 				client.on('error', function(err) {
 					poolResponse.destroy(client);
 				});
 				var reader = HTTPReaderStream();
 				var json = JSONStream();
 				client.pipe(reader).pipe(json).on('data', function(data) {
+					// This works because HTTP pipelining guarantees ordering.
 					var cb = client._QUEUE.shift();
 					if (typeof cb === 'function') {
 						cb(null, data);
 					}
 				});
+				callback(null, client);
 			});
 		},
 		destroy: function(client) {
@@ -123,7 +109,7 @@ var PubNubClient = function(options) {
 			sub_options = sub_options || {};
 		}
 		var headers = ['Host: ' + options.host];
-		poolSub.acquire(function(err, client) {
+		createSocketConnection(function(err, client) {
 			if (err) {
 				return callback && callback(err);
 			}
@@ -137,7 +123,7 @@ var PubNubClient = function(options) {
 				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF);
 			var reader = HTTPReaderStream();
 			var json = JSONStream(sub_options);
-			callback(null, client.pipe(reader).pipe(json), poolSub.destroy.bind(poolSub, client));
+			callback(null, client.pipe(reader).pipe(json), client.destroy.bind(client));
 		});
 	};
 
