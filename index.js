@@ -22,6 +22,9 @@ var PubNubClient = function(options) {
 		name: 'pubnub',
 		create: function(callback) {
 			dns.resolve(options.host, function(err, ips) {
+				if (err) {
+					return callback(err);
+				}
 				var client = (options.insecure ? net : tls).connect({
 					port: options.port,
 					host: ips[Math.floor(Math.random() * ips.length)],
@@ -46,6 +49,9 @@ var PubNubClient = function(options) {
 		name: 'pubnub',
 		create: function(callback) {
 			dns.resolve(options.host, function(err, ips) {
+				if (err) {
+					return callback(err);
+				}
 				var client = (options.insecure ? net : tls).connect({
 					port: options.port,
 					host: ips[Math.floor(Math.random() * ips.length)],
@@ -60,9 +66,9 @@ var PubNubClient = function(options) {
 				});
 				var stream = client.pipe(HTTPReaderStream());
 				stream.pipe(JSONStream()).on('data', function(data) {
-					var callback = client._QUEUE.shift();
-					if (typeof callback === 'function') {
-						callback(null, data);
+					var cb = client._QUEUE.shift();
+					if (typeof cb === 'function') {
+						cb(null, data);
 					}
 				});
 			});
@@ -124,7 +130,7 @@ var PubNubClient = function(options) {
 				options.subscribe_key,
 				querystring.escape(channel),
 				'0',
-				'10000'
+				sub_options.timetoken || '10000'
 			];
 			client.write('GET ' + get.join('/') + '?' + querystring.stringify(sub_options.params || {}) +
 				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF);
