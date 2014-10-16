@@ -1,7 +1,7 @@
 {
   "name": "pubnubjs",
-  "version": "0.0.8",
-  "description": "PubNub client",
+  "version": "0.0.9",
+  "description": "PubNub pipelined client",
   "main": "index.js",
   "scripts": {
     "test": "tape test/*.js"
@@ -16,5 +16,14 @@
     "rc": "^0.5.1",
     "tape": "^3.0.0",
     "uuid": "^2.0.1"
-  }
+  },
+  "homepage": "https://github.com/tralamazza/pubnubjs",
+  "bugs": "https://github.com/tralamazza/pubnubjs/issues",
+  "repository": {
+    "type": "git",
+    "url" : "https://github.com/tralamazza/pubnubjs.git"
+  },
+  "keywords": [
+    "pubnub"
+  ]
 }
