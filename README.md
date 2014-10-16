@@ -56,6 +56,6 @@ client.grant({
 
 ## Important
 
-* The module keeps 2 socket pools with a default idle timeout of 20s.
-* You can only publish js objects or JSON strings.
-* Subscribe will always yield objects.
+* We keep a socket pool with a default idle timeout of 20s, see `options.pool_idletimeout`
+* You can only publish objects or JSON strings.
+* `.subscribe()` returns an object stream.
