@@ -49,3 +49,20 @@ tape('subscribe without buffered messages', function(t) {
 		});
 	});
 });
+
+tape('encryption', function(t) {
+	t.plan(3);
+	var payload = { ts: Date.now() };
+	var channel = uuid.v4();
+	var key = uuid.v4();
+	pubnubjs.subscribe(channel, { cipher_key: key }, function(err, stream, unsub) {
+		t.error(err, 'subscribe success');
+		stream.on('data', function(data) {
+			t.deepEqual(data[0][0], payload, 'received the same data');
+			unsub();
+		});
+		pubnubjs.publish(channel, payload, { cipher_key: key }, function(err, data) {
+			t.error(err, 'publish success');
+		});
+	});
+});
