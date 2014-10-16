@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+
+var rc = require('rc')('pubnubjs');
+var spawn = require('child_process').spawn;
+
+spawn('travis', ['encrypt', 'pubnubjs_subscribe_key=' + rc.subscribe_key], { stdio: 'inherit' });
+spawn('travis', ['encrypt', 'pubnubjs_publish_key=' + rc.publish_key], { stdio: 'inherit' });
+spawn('travis', ['encrypt', 'pubnubjs_secret_key=' + rc.secret_key], { stdio: 'inherit' });
