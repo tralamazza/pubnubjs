@@ -19,7 +19,7 @@ var PubNubClient = function(options) {
 	options.pool_idletimeout = options.pool_idletimeout || 20000;
 
 	var poolSub = GenericPool.Pool({
-		name: 'pubnub',
+		name: 'subscriber',
 		create: function(callback) {
 			dns.resolve(options.host, function(err, ips) {
 				if (err) {
@@ -39,14 +39,14 @@ var PubNubClient = function(options) {
 			});
 		},
 		destroy: function(client) {
-			client.end();
+			client.destroy();
 		},
 		max: options.pool_max,
 		idleTimeoutMillis: options.pool_idletimeout
 	});
 
 	var poolResponse = GenericPool.Pool({
-		name: 'pubnub',
+		name: 'response',
 		create: function(callback) {
 			dns.resolve(options.host, function(err, ips) {
 				if (err) {
@@ -64,8 +64,9 @@ var PubNubClient = function(options) {
 				client.on('error', function(err) {
 					poolResponse.destroy(client);
 				});
-				var stream = client.pipe(HTTPReaderStream());
-				stream.pipe(JSONStream()).on('data', function(data) {
+				var reader = HTTPReaderStream();
+				var json = JSONStream();
+				client.pipe(reader).pipe(json).on('data', function(data) {
 					var cb = client._QUEUE.shift();
 					if (typeof cb === 'function') {
 						cb(null, data);
@@ -74,7 +75,7 @@ var PubNubClient = function(options) {
 			});
 		},
 		destroy: function(client) {
-			client.end();
+			client.destroy();
 			delete client._QUEUE;
 		},
 		max: options.pool_max,
@@ -134,10 +135,9 @@ var PubNubClient = function(options) {
 			];
 			client.write('GET ' + get.join('/') + '?' + querystring.stringify(sub_options.params || {}) +
 				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF);
-			client.on('end', function() {
-				poolSub.release(client);
-			});
-			callback(null, client.pipe(HTTPReaderStream()).pipe(JSONStream(sub_options)));
+			var reader = HTTPReaderStream();
+			var json = JSONStream(sub_options);
+			callback(null, client.pipe(reader).pipe(json), poolSub.destroy.bind(poolSub, client));
 		});
 	};
 

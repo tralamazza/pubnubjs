@@ -1,7 +1,5 @@
 # PubNub JS client
 
-WIP - NOT production ready
-
 	npm install pubnubjs
 
 ## Usage
@@ -37,10 +35,8 @@ Subscribes for 10s:
 client.subscribe('my_little_channel', {
 	// cipher_key: 'my encryption key',
 	// params: { auth: 'my auth key' }
-}, function(err, stream) {
-	setTimeout(function() {
-		stream.end();
-	}, 10000);
+}, function(err, stream, unsubscribe) {
+	setTimeout(unsubscribe, 10000);
 	stream.on('data', console.log);
 });
 ```
@@ -63,8 +59,3 @@ client.grant({
 * The module keeps 2 socket pools with a default idle timeout of 20s.
 * You can only publish js objects or JSON strings.
 * Subscribe will always yield objects.
-
-## TODO
-
-* Examples
-* Docs
