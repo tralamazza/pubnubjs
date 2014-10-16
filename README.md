@@ -1,4 +1,4 @@
-# PubNub JS client
+# PubNub JS client [![Build Status](https://travis-ci.org/tralamazza/pubnubjs.svg?branch=master)](https://travis-ci.org/tralamazza/pubnubjs)
 
 	npm install pubnubjs
 
