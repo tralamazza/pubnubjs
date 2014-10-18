@@ -33,6 +33,7 @@ Subscribes for 10s:
 
 ```js
 client.subscribe('my_little_channel', {
+	// timetoken: '0',
 	// cipher_key: 'my encryption key',
 	// params: { auth: 'my auth key' }
 }, function(err, stream, unsubscribe) {
