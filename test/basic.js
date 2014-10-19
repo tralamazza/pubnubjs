@@ -16,13 +16,13 @@ tape('publish', function(t) {
 	var payload = { some: 'data' };
 	pubnubjs.publish(gchannel, payload, function(err, data) {
 		t.error(err, 'publish success');
-		gtimetoken = data[1] - 10;
+		gtimetoken = (data.length > 2) ? data[2] : data[1];
 	});
 });
 
 tape('subscribe with buffered messages', function(t) {
 	t.plan(2);
-	pubnubjs.subscribe(gchannel, { timetoken: gtimetoken }, function(err, stream, unsub) {
+	pubnubjs.subscribe(gchannel, { timetoken: gtimetoken - 10 }, function(err, stream, unsub) {
 		t.error(err, 'subscribe success');
 		stream.on('data', function(data) {
 			t.equal(data[0].length, 1, 'exactly 1 message');
