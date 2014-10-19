@@ -117,7 +117,7 @@ var PubNubClient = function(options) {
 				options.subscribe_key,
 				querystring.escape(channel),
 				'0',
-				sub_options.timetoken || '10000'
+				(typeof sub_options.timetoken !== 'undefined') ? sub_options.timetoken : '10000'
 			];
 			client.write('GET ' + get.join('/') + '?' + querystring.stringify(sub_options.params || {}) +
 				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF);
