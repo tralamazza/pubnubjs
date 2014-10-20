@@ -3,6 +3,7 @@ var dns = require('dns');
 var querystring = require('querystring');
 var net = require('net');
 var tls = require('tls');
+var zlib = require('zlib');
 var genericPool = require('generic-pool');
 var HTTPReaderStream = require('./lib/http-reader-stream');
 var consts = require('./lib/consts');
@@ -32,7 +33,6 @@ var PubNubClient = function(options) {
 			}, function() {
 				callback(null, client);
 			});
-			client.setEncoding(consts.STRING_ENCODING);
 		});
 	};
 
@@ -109,6 +109,9 @@ var PubNubClient = function(options) {
 			sub_options = sub_options || {};
 		}
 		var headers = ['Host: ' + options.host];
+		if (sub_options.gzip) {
+			headers.push('Accept-Encoding: gzip');
+		}
 		createSocketConnection(function(err, client) {
 			if (err) {
 				return callback && callback(err);
@@ -119,10 +122,18 @@ var PubNubClient = function(options) {
 				'0',
 				(typeof sub_options.timetoken !== 'undefined') ? sub_options.timetoken : '10000'
 			];
-			client.write('GET ' + get.join('/') + '?' + querystring.stringify(sub_options.params || {}) +
-				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF);
+			var request = 'GET ' + get.join('/') + '?' + querystring.stringify(sub_options.params || {}) +
+				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF;
+			client.write(request);
 			var reader = HTTPReaderStream();
 			var json = JSONStream(sub_options);
+			reader.on('chunked_end', client.write.bind(client, request));
+			reader.on('headers', function(headers) {
+				if (headers.indexOf('Content-Encoding: gzip') >= 0) {
+					reader.unpipe();
+					reader.pipe(zlib.createGunzip()).pipe(json);
+				}
+			});
 			callback(null, client.pipe(reader).pipe(json), client.destroy.bind(client));
 		});
 	};

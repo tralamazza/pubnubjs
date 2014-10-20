@@ -22,7 +22,7 @@ tape('publish', function(t) {
 
 tape('subscribe with buffered messages', function(t) {
 	t.plan(2);
-	pubnubjs.subscribe(gchannel, { timetoken: gtimetoken - 10 }, function(err, stream, unsub) {
+	pubnubjs.subscribe(gchannel, { gzip: true, timetoken: gtimetoken - 10 }, function(err, stream, unsub) {
 		t.error(err, 'subscribe success');
 		stream.on('data', function(data) {
 			t.equal(data[0].length, 1, 'exactly 1 message');
