@@ -7,7 +7,7 @@
 * Implemented using PubNub's HTTP pipelining API
 * Authentication and Encryption keys are supplied per request
 * Supports gzip compression for `subscribe`
-* SSL by defau	lt
+* SSL by default
 
 ## Usage
 
