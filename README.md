@@ -2,6 +2,13 @@
 
 	npm install pubnubjs
 
+## Characteristics
+
+* Implemented using PubNub's HTTP pipelining API
+* Authentication and Encryption keys are supplied per request
+* Supports gzip compression for `subscribe`
+* SSL by defau	lt
+
 ## Usage
 
 Publishes every 100ms:
@@ -58,7 +65,7 @@ client.grant({
 ## Important
 
 * We keep a socket pool with a default idle timeout of 20s, see `options.pool_idletimeout`
-* You can only publish objects or JSON strings.
+* You should only publish objects or JSON strings.
 * `.subscribe()` returns an object stream.
 
 ## MIT Licensed
