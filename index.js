@@ -29,7 +29,8 @@ var PubNubClient = function(options) {
 			var client = (options.insecure ? net : tls).connect({
 				port: options.port,
 				host: ips[Math.floor(Math.random() * ips.length)],
-				servername: options.host
+				servername: options.host,
+				secureOptions: require('constants').SSL_OP_NO_SSLv3
 			}, function() {
 				callback(null, client);
 			});
