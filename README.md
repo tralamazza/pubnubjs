@@ -42,6 +42,7 @@ Subscribes for 10s:
 client.subscribe('my_little_channel', {
 	// timetoken: '0',
 	// cipher_key: 'my encryption key',
+	// gzip: false,
 	// params: { auth: 'my auth key' }
 }, function(err, stream, unsubscribe) {
 	setTimeout(unsubscribe, 10000);
