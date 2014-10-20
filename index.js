@@ -126,15 +126,18 @@ var PubNubClient = function(options) {
 				' HTTP/1.1' + consts.CRLF + headers.join(consts.CRLF) + consts.CRLF + consts.CRLF;
 			client.write(request);
 			var reader = HTTPReaderStream();
-			var json = JSONStream(sub_options);
+			client.pipe(reader);
 			reader.on('chunked_end', client.write.bind(client, request));
+			var json = JSONStream(sub_options);
 			reader.on('headers', function(headers) {
+				reader.unpipe();
 				if (headers.indexOf('Content-Encoding: gzip') >= 0) {
-					reader.unpipe();
 					reader.pipe(zlib.createGunzip()).pipe(json);
+				} else {
+					reader.pipe(json);
 				}
 			});
-			callback(null, client.pipe(reader).pipe(json), client.destroy.bind(client));
+			callback(null, json, client.destroy.bind(client));
 		});
 	};
 
