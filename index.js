@@ -53,7 +53,7 @@ var PubNubClient = function(options) {
 				var json = JSONStream();
 				client.pipe(reader).pipe(json).on('data', function(data) {
 					// This works because HTTP pipelining guarantees ordering.
-					var cb = client._QUEUE.shift();
+					var cb = client._QUEUE && client._QUEUE.shift();
 					if (typeof cb === 'function') {
 						cb(null, data);
 					}
