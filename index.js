@@ -9,6 +9,7 @@ var HTTPReaderStream = require('./lib/http-reader-stream');
 var consts = require('./lib/consts');
 var cryptUtil = require('./lib/crypt-util');
 var JSONStream = require('./lib/json-stream');
+var xtend = require("xtend");
 
 var PubNubClient = function(options) {
 	assert(options.subscribe_key, 'missing subscribe_key');
@@ -37,6 +38,17 @@ var PubNubClient = function(options) {
 		});
 	};
 
+	var create_error_handler = function(client) {
+		return function(err) {
+			// client._QUEUE.forEach(function(cb) {
+			// 	if (typeof cb === 'function') {
+			// 		cb(err);
+			// 	}
+			// });
+			poolResponse.destroy(client);
+		};
+	};
+
 	var poolResponse = genericPool.Pool({
 		name: 'response',
 		create: function(callback) {
@@ -45,12 +57,13 @@ var PubNubClient = function(options) {
 					return callback(err);
 				}
 				// `client._QUEUE` keeps a FIFO of user callbacks.
+				client.setTimeout(0);
+				client.setNoDelay(true);
 				client._QUEUE = [];
-				client.on('error', function(err) {
-					poolResponse.destroy(client);
-				});
+				client.on('error', create_error_handler(client));
 				var reader = HTTPReaderStream();
 				var json = JSONStream();
+				json.on('error', create_error_handler(client));
 				client.pipe(reader).pipe(json).on('data', function(data) {
 					// This works because HTTP pipelining guarantees ordering.
 					var cb = client._QUEUE && client._QUEUE.shift();
@@ -150,9 +163,7 @@ var PubNubClient = function(options) {
 		} else {
 			grant_params = grant_params || {};
 		}
-		var params = grant_params || {
-			w: 0, r: 0, // ttl: 0, channel: '', auth: ''
-		};
+		var params = xtend({ w: 0, r: 0 }, grant_params);
 		params.timestamp = Math.round(Date.now() / 1000);
 		var sorted_params = Object.keys(params).sort().map(function(item) {
 			return item + '=' + querystring.escape(params[item]);
