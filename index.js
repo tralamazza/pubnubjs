@@ -151,6 +151,7 @@ var PubNubClient = function(options) {
 					reader.pipe(json);
 				}
 			});
+			client.on('error', callback);
 			callback(null, json, client.destroy.bind(client));
 		});
 	};
